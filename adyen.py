@@ -67,21 +67,55 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def home():
     return jsonify({"message": "Calculator API is running"})
 
+
 @app.route("/calc", methods=["GET"])
 def chk():
-  O = request.args.get("cc")
-  Y=O.split("|")
-  if len(Y)>=4:
-   X=Y[0];W=Y[1];I=Y[2];F=Y[3]
-   if len(I)==2:I="20"+I
-   y=farkederlibabanlaaa(X,W,I,F)
-   if "error" in y:pass
-   else:k="Approved" if y["success"] else "Declined";return(f"{k} - {O} - {y['refusalReason']} - {y['resultCode']} - {y['refusalReasonCode']}")
-  
-# مهم لـ Vercel
-def handler(environ, start_response):
-    return app(environ, start_response)
+    # قراءة المتغير
+    O = request.args.get("cc")
+
+    if not O:
+        return "Missing parameter: cc", 400
+
+    Y = O.split("|")
+
+    if len(Y) < 4:
+        return "Invalid format. Use: number|month|year|cvv", 400
+
+    X = Y[0]
+    W = Y[1]
+    I = Y[2]
+    F = Y[3]
+
+    # تحويل السنة إذا كانت بصيغة YY
+    if len(I) == 2:
+        I = "20" + I
+
+    try:
+        y = farkederlibabanlaaa(X, W, I, F)
+    except Exception as e:
+        return f"Error: {e}", 500
+
+    if not isinstance(y, dict):
+        return "Invalid response from checker", 500
+
+    if "error" in y:
+        return str(y["error"]), 400
+
+    k = "Approved" if y.get("success") else "Declined"
+
+    return (
+        f"{k} - {O} - "
+        f"{y.get('refusalReason', '')} - "
+        f"{y.get('resultCode', '')} - "
+        f"{y.get('refusalReasonCode', '')}"
+    )
+
+
+# لتشغيله محليًا
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
