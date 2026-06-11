@@ -1,4 +1,4 @@
-import requests,json,urllib3,time,os,base64,pytz,jsonify
+import requests,json,urllib3,time,os,base64,pytz
 from datetime import datetime
 from os import urandom
 from cryptography.hazmat.backends import default_backend
